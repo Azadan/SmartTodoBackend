@@ -1,9 +1,6 @@
 package com.smarttodo.smarttodo.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,5 +22,13 @@ public class Todo {
     private String description;
 
     private boolean isCompleted = false;
+
+    /*
+     * Many-to-One relation med User
+     * FetchType.LAZY betyder att User-objektet endast hämtas från databasen när det behövs
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
 }
