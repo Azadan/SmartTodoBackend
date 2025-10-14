@@ -50,11 +50,11 @@ public class User {
 
     // Admin ska kunna logga in och ha en chatt med en användare som kundtjänst
     @Column(nullable = false)
-    private String isAdmin;
+    private boolean isAdmin;
 
     // Premium user för att kunna använda obegränsat mängd tasks
     @Column(nullable = false)
-    private String isPremiumUser;
+    private boolean isPremiumUser;
 
     // Sparar datum för senaste dagliga reset av tasks
     @Column(nullable = true)
