@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -59,4 +60,12 @@ public class User {
     // Sparar datum för senaste dagliga reset av tasks
     @Column(nullable = true)
     private LocalDate lastDailyReset;
+
+    /*
+     * One-to-Many relation med Todos
+     * CascadeType.ALL: Alla operationer (persist, merge, remove, refresh, detach) på User kommer att kaskaderas till dess Todos.
+     * FetchType.LAZY: Todos laddas endast när de efterfrågas, vilket förbättrar prestanda.
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Todo> todos;
 }
