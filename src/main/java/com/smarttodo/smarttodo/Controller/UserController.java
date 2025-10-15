@@ -10,6 +10,8 @@ import com.smarttodo.smarttodo.Service.UserService;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +28,9 @@ public class UserController {
 
     private final UserService userService;
 
-    private final MapStructUserMapper userMapper;
+
+    private final MapStructUserMapper userMapper = Mappers.getMapper(MapStructUserMapper.class);
+
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse> createUser(@Valid @RequestBody CreateUserRequest createUserRequest) {
