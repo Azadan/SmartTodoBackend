@@ -5,6 +5,7 @@ import com.smarttodo.smarttodo.Exception.UserAlreadyExistException;
 import com.smarttodo.smarttodo.Repository.UserRepository;
 import com.smarttodo.smarttodo.Request.CreateUserRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -15,6 +16,8 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final PasswordEncoder passwordEncoder;
+
 
     public User createUser(CreateUserRequest req) {
         return Optional.of(req)
@@ -24,7 +27,7 @@ public class UserService {
                     user.setEmail(request.getEmail());
                     user.setFirstName(request.getFirstName());
                     user.setLastName(request.getLastName());
-                    user.setPassword(request.getPassword());
+                    user.setPassword(passwordEncoder.encode(request.getPassword()));
                     user.setPremiumUser(false);
                     user.setAdmin(false);
                     user.setLastDailyReset(null);
