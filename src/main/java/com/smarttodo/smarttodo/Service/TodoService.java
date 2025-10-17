@@ -2,6 +2,7 @@ package com.smarttodo.smarttodo.Service;
 
 import java.util.List;
 
+import com.smarttodo.smarttodo.Exception.MaximumTodoCountException;
 import org.springframework.stereotype.Service;
 
 import com.smarttodo.smarttodo.Entity.Todo;
@@ -24,6 +25,13 @@ public class TodoService {
 
     public Todo createTodo(CreateTodoRequest req) {
         User user = userRepository.findById(req.getUserId()).orElseThrow(() -> new UserNotFoundException("User with this "+ req.getUserId() +" is not found"));
+        if (!user.isPremiumUser()){
+            long todoCount = todoRepository.countByUser_UserId(req.getUserId());
+            if (todoCount >= 5) {
+                throw new MaximumTodoCountException("Free users can only create up to 5 todos. Please upgrade to premium to create more.");
+            }
+        }
+
         Todo todo = new Todo();
         todo.setTitle(req.getTitle());
         todo.setDescription(req.getDescription());
