@@ -22,7 +22,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long userId;
+    private Long userId;
 
     // Nedan kommer att behövas sen för korrekt stripe impl
     //private String stripeId;
