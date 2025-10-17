@@ -26,8 +26,6 @@ public class AuthenticationService {
 
     private final JwtUtil jwtUtils;
 
-    private final MapStructUserMapper userMapper = Mappers.getMapper(MapStructUserMapper.class);
-
 
     /*
      * En metod för inloggning av användare.
@@ -46,7 +44,7 @@ public class AuthenticationService {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
         String token = jwtUtils.generateToken(userDetails.getUsername(), user.getUserId());
-        UserDTO userDTO = userMapper.userToUserDTO(user);
+        UserDTO userDTO = MapStructUserMapper.INSTANCE.userToUserDTO(user);
 
         return new AuthResponse(token, userDTO);
     }

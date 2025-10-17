@@ -3,9 +3,12 @@ package com.smarttodo.smarttodo.Controller;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 
 import com.smarttodo.smarttodo.DTO.TodoDTO;
 import com.smarttodo.smarttodo.Entity.Todo;
+import com.smarttodo.smarttodo.Exception.MaximumTodoCountException;
+import com.smarttodo.smarttodo.Exception.TodosNotFoundException;
 import com.smarttodo.smarttodo.Exception.UserNotFoundException;
 import com.smarttodo.smarttodo.Mapper.MapStructTodoMapper;
 import com.smarttodo.smarttodo.Request.CreateTodoRequest;
@@ -38,6 +41,8 @@ public class TodoController {
             return ResponseEntity.ok(new ApiResponse("Todo created successfully", true, todoDTO));
         } catch (UserNotFoundException e) {
         return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("A user with this id has not been found", false, e));
+        } catch (MaximumTodoCountException e) {
+            return ResponseEntity.status(UNPROCESSABLE_ENTITY).body(new ApiResponse("The user has reached the maximum number of todos allowed", false, null));
         }
     }
 
@@ -49,6 +54,8 @@ public class TodoController {
             return ResponseEntity.ok(new ApiResponse("Todos retrieved successfully", true, todoDTOS));
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("A user with this id has not been found", false, e));
+        } catch (TodosNotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("No todos found for this user", false, e));
         }
     }
 }
