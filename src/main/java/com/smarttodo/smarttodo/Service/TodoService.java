@@ -3,6 +3,7 @@ package com.smarttodo.smarttodo.Service;
 import java.util.List;
 
 import com.smarttodo.smarttodo.Exception.MaximumTodoCountException;
+import com.smarttodo.smarttodo.Exception.TodosNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.smarttodo.smarttodo.Entity.Todo;
@@ -44,6 +45,10 @@ public class TodoService {
         if (user==null){
             throw new UserNotFoundException("User with this "+ userId +" is not found");
         }
-        return todoRepository.findAllByUser_UserId(userId);
+        List<Todo> todos = todoRepository.findAllByUser_UserId(userId);
+        if (todos.isEmpty()) {
+            throw new TodosNotFoundException("No todos found for user with ID: " + userId);
+        }
+        return todos;
     }
 }
