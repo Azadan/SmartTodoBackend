@@ -10,7 +10,6 @@ import com.smarttodo.smarttodo.Service.UserService;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.mapstruct.factory.Mappers;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,14 +27,13 @@ public class UserController {
     private final UserService userService;
 
 
-    private final MapStructUserMapper userMapper = Mappers.getMapper(MapStructUserMapper.class);
 
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse> createUser(@Valid @RequestBody CreateUserRequest createUserRequest) {
         try {
             User user = userService.createUser(createUserRequest);
-            UserDTO userDTO = userMapper.userToUserDTO(user);
+            UserDTO userDTO = MapStructUserMapper.INSTANCE.userToUserDTO(user);
             return ResponseEntity.ok(new ApiResponse("New user has succesfully been created", true, userDTO));
         } catch (UserAlreadyExistException e) {
             return ResponseEntity.status(CONFLICT).body(new ApiResponse("A user with this email already exists", false, e));

@@ -1,15 +1,17 @@
 package com.smarttodo.smarttodo.Service;
 
-import com.smarttodo.smarttodo.DTO.TodoDTO;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.smarttodo.smarttodo.Entity.Todo;
 import com.smarttodo.smarttodo.Entity.User;
 import com.smarttodo.smarttodo.Exception.UserNotFoundException;
-import com.smarttodo.smarttodo.Mapper.MapStructTodoMapper;
 import com.smarttodo.smarttodo.Repository.TodoRepository;
 import com.smarttodo.smarttodo.Repository.UserRepository;
 import com.smarttodo.smarttodo.Request.CreateTodoRequest;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -27,5 +29,13 @@ public class TodoService {
         todo.setDescription(req.getDescription());
         todo.setUser(user);
         return todoRepository.save(todo);
+    }
+
+    public List<Todo> getTodosByUserId(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User with this "+ userId +" is not found"));
+        if (user==null){
+            throw new UserNotFoundException("User with this "+ userId +" is not found");
+        }
+        return todoRepository.findAllByUser_UserId(userId);
     }
 }
