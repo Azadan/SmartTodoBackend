@@ -1,8 +1,10 @@
 package com.smarttodo.smarttodo.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.smarttodo.smarttodo.Exception.MaximumTodoCountException;
+import com.smarttodo.smarttodo.Exception.TodoNotFoundException;
 import com.smarttodo.smarttodo.Exception.TodosNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -50,5 +52,16 @@ public class TodoService {
             throw new TodosNotFoundException("No todos found for user with ID: " + userId);
         }
         return todos;
+    }
+
+    public Todo toggleTodo(Long todoId) {
+        Todo todo = todoRepository.findById(todoId)
+                .orElseThrow(() -> new TodoNotFoundException("Todo with ID " + todoId + " not found"));
+        if (todo.isCompleted()) {
+            todo.setCompleted(false);
+            return todoRepository.save(todo);
+        }
+        todo.setCompleted(true);
+        return todoRepository.save(todo);
     }
 }
