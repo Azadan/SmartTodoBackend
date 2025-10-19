@@ -8,6 +8,7 @@ import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import com.smarttodo.smarttodo.DTO.TodoDTO;
 import com.smarttodo.smarttodo.Entity.Todo;
 import com.smarttodo.smarttodo.Exception.MaximumTodoCountException;
+import com.smarttodo.smarttodo.Exception.TodoNotFoundException;
 import com.smarttodo.smarttodo.Exception.TodosNotFoundException;
 import com.smarttodo.smarttodo.Exception.UserNotFoundException;
 import com.smarttodo.smarttodo.Mapper.MapStructTodoMapper;
@@ -56,6 +57,17 @@ public class TodoController {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("A user with this id has not been found", false, e));
         } catch (TodosNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("No todos found for this user", false, e));
+        }
+    }
+
+    @PostMapping("/toggleTodo")
+    public ResponseEntity<ApiResponse> toggleTodo(@RequestParam Long todoId) {
+        try {
+            Todo todo = todoService.toggleTodo(todoId);
+            TodoDTO todoDTO = MapStructTodoMapper.INSTANCE.todoToTodoDTO(todo);
+            return ResponseEntity.ok(new ApiResponse("Todo marked as completed", true, todoDTO));
+        } catch (TodoNotFoundException e) {
+            return ResponseEntity.status(NOT_FOUND).body(new ApiResponse("Todo with this id has not been found", false, e));
         }
     }
 }
