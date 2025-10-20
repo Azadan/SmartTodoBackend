@@ -1,4 +1,4 @@
 package com.smarttodo.smarttodo.Request;
 
-public class ChatMessageRequest {
+public record ChatMessageRequest(String text) {
 }
