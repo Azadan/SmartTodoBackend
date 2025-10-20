@@ -42,4 +42,16 @@ public class UserController {
         }
     }
 
+    @PostMapping("/registerAdmin")
+    public ResponseEntity<ApiResponse> createUserAdmin(@Valid @RequestBody CreateUserRequest createUserRequest) {
+        try {
+            User user = userService.createAdminUser(createUserRequest);
+            UserDTO userDTO = MapStructUserMapper.INSTANCE.userToUserDTO(user);
+            return ResponseEntity.ok(new ApiResponse("New admin user has succesfully been created", true, userDTO));
+        } catch (UserAlreadyExistException e) {
+            return ResponseEntity.status(CONFLICT).body(new ApiResponse("A user with this email already exists", false, e));
+        } catch (ConstraintViolationException e) {
+            return ResponseEntity.status(BAD_REQUEST).body(new ApiResponse("Validation error: " + e.getMessage(), false, e));
+        }
+    }
 }
