@@ -62,8 +62,9 @@ public class WebSecurityConfig {
                 // Endast endpoints för registrering och autentisering är publika
                 .authorizeHttpRequests(authorizeHttpRequests ->
                         authorizeHttpRequests
-                                .requestMatchers("/api/v1/admin/chat").authenticated()
-                                .anyRequest().permitAll()
+                                .requestMatchers("/api/v1/auth/**").permitAll()
+                                .requestMatchers("/api/v1/users/**").permitAll()
+                                .anyRequest().authenticated()
                 );
         // Lägger till vår AuthTokenFilter innan UsernamePasswordAuthenticationFilter i filterkedjan
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
