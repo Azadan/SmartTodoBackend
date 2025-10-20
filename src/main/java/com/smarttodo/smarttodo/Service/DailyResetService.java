@@ -18,12 +18,15 @@ public class DailyResetService {
     @Scheduled(cron = "0 0 0 * * ?")
     @Transactional
     public void dailyReset() {
-        List<Todo> completedTodos = todoRepository.findByCompletedTrue();
+        List<Todo> completedTodos = todoRepository.findAll()
+                .stream()
+                .filter(Todo::isCompleted)
+                .toList();
 
-        for (Todo todo : completedTodos) {
-            todo.setCompleted(false);
+        completedTodos.forEach(t -> t.setCompleted(false));
+
+        if (!completedTodos.isEmpty()) {
+            todoRepository.saveAll(completedTodos);
         }
-
-        todoRepository.saveAll(completedTodos);
     }
 }
