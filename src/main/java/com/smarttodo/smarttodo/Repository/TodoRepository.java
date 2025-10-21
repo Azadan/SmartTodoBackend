@@ -11,5 +11,4 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
 
     long countByUser_UserId(Long userId);
 
-    List<Todo> findByCompletedTrue();
 }

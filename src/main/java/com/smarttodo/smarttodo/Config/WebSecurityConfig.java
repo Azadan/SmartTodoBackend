@@ -64,6 +64,7 @@ public class WebSecurityConfig {
                         authorizeHttpRequests
                                 .requestMatchers("/api/v1/auth/**").permitAll()
                                 .requestMatchers("/api/v1/users/**").permitAll()
+                                .requestMatchers("/ws/**").permitAll()
                                 .anyRequest().authenticated()
                 );
         // Lägger till vår AuthTokenFilter innan UsernamePasswordAuthenticationFilter i filterkedjan
@@ -78,8 +79,10 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         // Definierar vilka origins som är tillåtna att göra förfrågningar från
-        config.setAllowedOrigins(List.of("*"));
-        // Definerar vilka HTTP metoder som är tillåtna.
+        config.setAllowedOriginPatterns(List.of(
+                "http://localhost:3000",
+                "http://localhost:63343"
+        ));        // Definerar vilka HTTP metoder som är tillåtna.
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         // Definierar vilka headers som är tillåtna
         config.setAllowedHeaders(List.of("*"));
