@@ -80,7 +80,7 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         // Definierar vilka origins som är tillåtna att göra förfrågningar från
         config.setAllowedOriginPatterns(List.of(
-                "http://localhost:3000",
+                "http://localhost:4200",
                 "http://localhost:63343"
         ));        // Definerar vilka HTTP metoder som är tillåtna.
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
