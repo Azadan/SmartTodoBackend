@@ -11,6 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URLDecoder;
+
 @RestController
 @RequiredArgsConstructor
 public class ChatController {
@@ -41,10 +43,20 @@ public class ChatController {
     public void adminToUser(@DestinationVariable String email,
                             ChatMessageRequest req,
                             Authentication auth) {
+
+        String decodedEmail;
+        try{
+            decodedEmail = URLDecoder.decode(email, "UTF-8");
+        } catch(Exception e) {
+            System.out.println("Url decode failed");
+            decodedEmail = email;
+        }
+
+        ChatMessageResponse response = new ChatMessageResponse(auth.getName(), req.text());
         template.convertAndSendToUser(
-                email,
+                decodedEmail,
                 "/queue/support",
-                new ChatMessageResponse(auth.getName(), req.text())
+                response
         );
     }
 }
