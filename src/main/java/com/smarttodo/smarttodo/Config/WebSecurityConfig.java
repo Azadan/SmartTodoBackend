@@ -65,6 +65,7 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/v1/auth/**").permitAll()
                                 .requestMatchers("/api/v1/users/**").permitAll()
                                 .requestMatchers("/ws/**").permitAll()
+                                .requestMatchers("/api/v1/billing/webhook").permitAll()
                                 .anyRequest().authenticated()
                 );
         // Lägger till vår AuthTokenFilter innan UsernamePasswordAuthenticationFilter i filterkedjan
