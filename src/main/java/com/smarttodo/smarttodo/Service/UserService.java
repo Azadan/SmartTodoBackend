@@ -6,6 +6,7 @@ import com.smarttodo.smarttodo.Repository.UserRepository;
 import com.smarttodo.smarttodo.Request.CreateUserRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -50,5 +51,11 @@ public class UserService {
                     user.setLastDailyReset(null);
                     return userRepository.save(user);
                 }).orElseThrow(() -> new UserAlreadyExistException("User with this username already exists"));
+    }
+
+    public User getLoggedInUser(Authentication authentication) {
+        String userEmail = authentication.getName();
+        return userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new UserAlreadyExistException("User with this email not found"));
     }
 }
