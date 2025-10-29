@@ -3,18 +3,18 @@ package com.smarttodo.smarttodo.Controller;
 import com.smarttodo.smarttodo.DTO.UserDTO;
 import com.smarttodo.smarttodo.Entity.User;
 import com.smarttodo.smarttodo.Exception.UserAlreadyExistException;
+import com.smarttodo.smarttodo.Exception.UserNotFoundException;
 import com.smarttodo.smarttodo.Mapper.MapStructUserMapper;
 import com.smarttodo.smarttodo.Request.CreateUserRequest;
 import com.smarttodo.smarttodo.Response.ApiResponse;
+import com.smarttodo.smarttodo.Service.StripeService;
 import com.smarttodo.smarttodo.Service.UserService;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -25,6 +25,7 @@ import static org.springframework.http.HttpStatus.CONFLICT;
 public class UserController {
 
     private final UserService userService;
+    private final StripeService stripeService;
 
 
 
@@ -53,5 +54,16 @@ public class UserController {
         } catch (ConstraintViolationException e) {
             return ResponseEntity.status(BAD_REQUEST).body(new ApiResponse("Validation error: " + e.getMessage(), false, e));
         }
+    }
+
+    @GetMapping("/getLoggedInUser")
+    public ResponseEntity<ApiResponse> getLoggedInUser (Authentication auth){
+            try {
+                User user = userService.getLoggedInUser(auth);
+                UserDTO userDTO = MapStructUserMapper.INSTANCE.userToUserDTO(user);
+                return ResponseEntity.ok(new ApiResponse("Logged in user fetched successfully", true, userDTO));
+            } catch (UserNotFoundException e) {
+                return ResponseEntity.status(BAD_REQUEST).body(new ApiResponse("Error fetching logged in user", false, e.getMessage()));
+            }
     }
 }
