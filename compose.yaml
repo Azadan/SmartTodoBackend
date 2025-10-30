@@ -8,3 +8,6 @@ services:
       - 'MYSQL_USER=smarttodo'
     ports:
       - '3306'
+volumes:
+  mysql_data:
+    driver: local
