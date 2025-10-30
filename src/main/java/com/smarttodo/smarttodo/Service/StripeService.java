@@ -40,11 +40,21 @@ public class StripeService {
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
+
+    /*
+     * Skapar en Stripe checkout session för en användare och returnerar URL:en för betalningen
+     * @param userId ID för användaren som skapar sessionen
+     * @return URL för Stripe checkout session
+     * @throws StripeException om det uppstår ett fel vid skapandet av sessionen
+     */
     public String createCheckoutSession(Long userId) throws StripeException {
+        //Börjar med att säkerställa att användaren finns innan vi skickar ett id till stripe
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User with this " + userId + " is not found"));
 
+        // Skapar line items för checkout session
         List<SessionCreateParams.LineItem> lineItems = new ArrayList<>();
 
+        // Lägg till en line item med pris-ID och kvantitet
         lineItems.add(
                 SessionCreateParams.LineItem.builder()
                         .setPrice(stripeConfig.getStripePriceId())
@@ -52,12 +62,18 @@ public class StripeService {
                         .build()
         );
 
+        // Skapar checkout session med referens till användaren och nödvändiga URL:er
         SessionCreateParams params = SessionCreateParams.builder()
+                // Payment mode
                 .setMode(SessionCreateParams.Mode.PAYMENT)
+                // Referens till användaren
                 .setClientReferenceId(user.getUserId().toString())
+                // Line items (alltså vad som ska köpas)
                 .addAllLineItem(lineItems)
+                // URL:er för framgång och misslyckad betalning
                 .setSuccessUrl(frontendUrl + "/payment-success")
                 .setCancelUrl(frontendUrl + "/payment-canceled")
+                // Metadata för att lagra användar-ID
                 .putMetadata("userId", user.getUserId().toString())
                 .addExpand("line_items")
                 .build();
@@ -66,13 +82,22 @@ public class StripeService {
         return session.getUrl();
     }
 
+    /*
+     * Hanterar inkommande webhook-händelser från Stripe och triggar vidare hantering
+     * @param payload JSON-payload från webhook-händelsen
+     * @param sigHeader Signaturheader för att verifiera webhook-händelsen
+     * @return true om händelsen hanterades framgångsrikt, annars false
+     */
     public boolean webhookEventHandler(String payload, String sigHeader) {
         try {
+            // Verifiera och konstruera Stripe-händelsen från payload och signatur
             Event event = Webhook.constructEvent(
                     payload, sigHeader, stripeConfig.getStripeWebhookSecret()
             );
 
+            // Om eventet är en slutförd checkout-session, hantera den
             if ("checkout.session.completed".equals(event.getType())) {
+                // Deserialisera objektet i eventet till en Session
                 parseAndProcessSessionFromJson(payload);
             }
 
@@ -84,6 +109,11 @@ public class StripeService {
         }
     }
 
+    /*
+     * Hämtar den inloggade användaren från säkerhetskontexten och returnerar användarobjektet
+     * @return Användarobjektet för den inloggade användaren
+     * @throws UserNotFoundException om användaren inte hittas i databasen
+     */
     public User putUserInSession() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
@@ -97,15 +127,19 @@ public class StripeService {
         return user.get();
     }
 
+    /*
+     * Plockar utt relevant information från JSON-payloaden och uppgraderar användaren till premium
+     * @param payload JSON-payload från webhook-händelsen
+     */
     private void parseAndProcessSessionFromJson(String payload) {
         try {
+            // Omvandla Json-payload till JSONObject. Då blir det lättare att plocka ut data
             JSONObject eventJson = new JSONObject(payload);
             JSONObject dataObject = eventJson.getJSONObject("data");
             JSONObject sessionObject = dataObject.getJSONObject("object");
 
-            System.out.println("Parsed session object from JSON");
 
-            // Försök hämta client_reference_id
+            // Försök hämta client_reference_id som sättes vid skapandet av sessionen
             String clientReferenceId = null;
             if (sessionObject.has("client_reference_id") && !sessionObject.isNull("client_reference_id")) {
                 clientReferenceId = sessionObject.getString("client_reference_id");
@@ -120,10 +154,11 @@ public class StripeService {
                 }
             }
 
-            // Processa userId
+            // Uppgradera användaren till premium baserat på tillgängligt ID
             if (clientReferenceId != null) {
                 Long userId = Long.parseLong(clientReferenceId);
                 upgradeToPremium(userId);
+                // Logik för att uppgradera användaren till premium med clientReferenceId. Ifall ovan misslyckas
             } else if (userIdFromMetadata != null) {
                 Long userId = Long.parseLong(userIdFromMetadata);
                 upgradeToPremium(userId);
