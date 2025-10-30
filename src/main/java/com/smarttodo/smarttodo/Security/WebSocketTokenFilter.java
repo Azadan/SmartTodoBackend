@@ -38,21 +38,21 @@ public class WebSocketTokenFilter implements ChannelInterceptor {
 
         if (accessor == null) return message;
 
-        // Endast vid CONNECT kommando
+        // Beror endast om det är CONNECT, SUBSCRIBE eller SEND kommando
         if (accessor.getCommand() == StompCommand.CONNECT ||
                 accessor.getCommand() == StompCommand.SUBSCRIBE ||
                 accessor.getCommand() == StompCommand.SEND) {
 
 
 
-            // Kolla ifall en användare redan finns i securityContext
+            // Kolla ifall en användare redan finns i securityContext. Om det finns så återanvänds den
             Authentication existingAuth = SecurityContextHolder.getContext().getAuthentication();
             if (existingAuth != null && existingAuth.isAuthenticated()) {
                 accessor.setUser(existingAuth);
                 return message;
             }
 
-            // hämtar token
+            // hämtar token från Stomp headern
             String token = parseJwt(accessor);
 
             if (token != null  && jwtUtil.validateToken(token)) {
