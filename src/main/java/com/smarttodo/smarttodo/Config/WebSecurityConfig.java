@@ -82,7 +82,8 @@ public class WebSecurityConfig {
         // Definierar vilka origins som är tillåtna att göra förfrågningar från
         config.setAllowedOriginPatterns(List.of(
                 "http://localhost:4200",
-                "http://localhost:63343"
+                "http://localhost:63343",
+                "https://sea-lion-app-9rbwy.ondigitalocean.app"
         ));        // Definerar vilka HTTP metoder som är tillåtna.
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         // Definierar vilka headers som är tillåtna
